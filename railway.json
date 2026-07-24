@@ -18,7 +18,7 @@
       "description": "AnythingMCP — NestJS Backend + Next.js Frontend",
       "icon": "https://raw.githubusercontent.com/HelpCode-ai/anythingmcp/main/packages/frontend/public/logo.svg",
       "source": {
-        "repo": "HelpCode-ai/anythingmcp"
+        "repo": "hillstreet-ph/open-hide"
       },
       "build": {
         "builder": "DOCKERFILE",
@@ -51,8 +51,7 @@
           "required": true
         },
         "DATABASE_URL": {
-          "description": "PostgreSQL connection string (auto-populated by Railway)",
-          "default": "${{postgres.DATABASE_URL}}",
+          "description": "Supabase PostgreSQL connection string (set in Railway Variables)",
           "required": true
         },
         "JWT_SECRET": {
@@ -144,12 +143,6 @@
           "required": false
         }
       }
-    },
-    {
-      "name": "postgres",
-      "description": "PostgreSQL 17 — managed database with automatic backups",
-      "plugin": "postgresql",
-      "pluginVersion": "17"
     }
   ]
 }

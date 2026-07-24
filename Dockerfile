@@ -82,7 +82,7 @@ RUN npm run build
 
 # ── Stage 4: Production ─────────────────────────────────────────────────────
 FROM node:${NODE_VERSION} AS runner
-RUN apk add --no-cache wget
+RUN apk add --no-cache wget ca-certificates
 WORKDIR /app
 
 ENV NODE_ENV=production
