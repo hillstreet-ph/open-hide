@@ -21,13 +21,15 @@ echo "==> Starting backend (port 4000)..."
 # Cap the V8 heap so a runaway allocation fails *this* process (caught by the
 # liveness loop below → container restart) instead of OOM-killing the whole host.
 # Override via NODE_MAX_OLD_SPACE_MB; default 2048 suits a ~4GB host.
-node --max-old-space-size="${NODE_MAX_OLD_SPACE_MB:-2048}" dist/src/main.js &
+# Force PORT=4000 so the backend never conflicts with the frontend (which
+# listens on Railway's $PORT, defaulting to 3000).
+PORT=4000 node --max-old-space-size="${NODE_MAX_OLD_SPACE_MB:-2048}" dist/src/main.js &
 BACKEND_PID=$!
 
 echo "==> Starting frontend (port 3000)..."
 # Next.js standalone in a monorepo preserves the workspace directory structure
 cd /app/frontend/packages/frontend
-HOSTNAME=0.0.0.0 PORT=3000 node server.js &
+HOSTNAME=0.0.0.0 PORT="${PORT:-3000}" node server.js &
 FRONTEND_PID=$!
 
 echo "==> AnythingMCP running — backend PID=$BACKEND_PID, frontend PID=$FRONTEND_PID"
