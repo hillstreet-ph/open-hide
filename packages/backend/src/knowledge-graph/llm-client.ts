@@ -1,13 +1,14 @@
 /**
  * Minimal provider-agnostic LLM client for KG enrichment.
- * Supports OpenAI, OpenRouter (OpenAI-compatible) and Anthropic. No SDK — just
- * fetch — so it adds no dependencies. JSON-only responses.
+ * Supports OpenAI, OpenRouter (OpenAI-compatible), Anthropic, and Ollama.
+ * No SDK — just fetch — so it adds no dependencies. JSON-only responses.
  */
 
 export interface LlmConfig {
-  provider: 'openai' | 'openrouter' | 'anthropic';
+  provider: 'openai' | 'openrouter' | 'anthropic' | 'ollama';
   model: string;
   apiKey: string;
+  baseUrl?: string;
 }
 
 /** Resolve provider/model/key from env, or null when no key is configured. */
@@ -18,13 +19,16 @@ export function resolveLlmConfig(): LlmConfig | null {
       ? process.env.OPENROUTER_API_KEY
       : provider === 'anthropic'
         ? process.env.ANTHROPIC_API_KEY
-        : process.env.OPENAI_API_KEY;
-  if (!apiKey) return null;
+        : provider === 'ollama'
+          ? ''  // Ollama requires no API key
+          : process.env.OPENAI_API_KEY;
+  if (provider !== 'ollama' && !apiKey) return null;
   const model =
     process.env.KG_LLM_MODEL ||
     // Anthropic default: Haiku 4.5 (claude-3-5-haiku was retired Feb 2026).
-    (provider === 'anthropic' ? 'claude-haiku-4-5' : 'gpt-4o-mini');
-  return { provider, model, apiKey };
+    (provider === 'anthropic' ? 'claude-haiku-4-5' : provider === 'ollama' ? 'llama3.2:3b' : 'gpt-4o-mini');
+  const baseUrl = provider === 'ollama' ? (process.env.KG_OLLAMA_BASE_URL || 'http://localhost:11434') : undefined;
+  return { provider, model, apiKey, baseUrl };
 }
 
 export interface LlmResult {
@@ -85,10 +89,16 @@ export async function chatJson(
   const base =
     cfg.provider === 'openrouter'
       ? 'https://openrouter.ai/api/v1'
-      : 'https://api.openai.com/v1';
+      : cfg.provider === 'ollama'
+        ? `${cfg.baseUrl || 'http://localhost:11434'}/v1`
+        : 'https://api.openai.com/v1';
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (cfg.provider !== 'ollama') {
+    headers['Authorization'] = `Bearer ${cfg.apiKey}`;
+  }
   const r = await fetch(`${base}/chat/completions`, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${cfg.apiKey}`, 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify({
       model: cfg.model,
       temperature: 0,
@@ -125,6 +135,9 @@ export async function submitBatch(
   cfg: LlmConfig,
   requests: BatchRequest[],
 ): Promise<string> {
+  if (cfg.provider === 'ollama') {
+    throw new Error('Batch mode is not supported for the Ollama provider.');
+  }
   if (cfg.provider !== 'anthropic') {
     throw new Error('Batch mode currently supports the anthropic provider only.');
   }

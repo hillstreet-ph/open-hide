@@ -175,9 +175,12 @@ tiny built-in client (no SDK). Two ways to run them:
 ```bash
 # Master switch + API key for any AI feature
 KG_LLM_ENABLED=false
-KG_LLM_PROVIDER=openai          # openai | openrouter | anthropic
-KG_LLM_MODEL=gpt-4o-mini        # anthropic default: claude-haiku-4-5
-OPENAI_API_KEY=                 # or OPENROUTER_API_KEY / ANTHROPIC_API_KEY
+KG_LLM_PROVIDER=openai          # openai | openrouter | anthropic | ollama
+KG_LLM_MODEL=gpt-4o-mini        # anthropic default: claude-haiku-4-5 | ollama default: llama3.2:3b
+OPENAI_API_KEY=                 # or OPENROUTER_API_KEY / ANTHROPIC_API_KEY (ollama needs no key)
+
+# Ollama-specific (when KG_LLM_PROVIDER=ollama):
+# KG_OLLAMA_BASE_URL=http://169.58.68.183:11434
 
 # Scheduled extension (cloud cron) — all must align: this flag, the cron call,
 # and the per-workspace "Scheduled AI extension" switch
