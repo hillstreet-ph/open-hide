@@ -1,0 +1,26 @@
+{
+  "$schema": "https://app.kilo.ai/config.json",
+  "disabled_providers": ["kilo"],
+  "enabled_providers": ["openai"],
+  "provider": {
+    "openai": {
+      "options": {
+        "apiKey": "ollama-local",
+        "baseURL": "http://169.58.68.183:11434/v1",
+        "timeout": 300000
+      },
+      "models": {
+        "gemma4": { "name": "gemma4" }
+      }
+    }
+  },
+  "model": "openai/gemma4",
+  "agent": {},
+  "command": {},
+  "mcp": {},
+  "mode": {},
+  "plugin": [],
+  "instructions": [],
+  "autoupdate": false,
+  "snapshot": true
+}
