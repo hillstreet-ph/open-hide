@@ -219,3 +219,5 @@ We welcome contributions! Please read our [Contributing guide](CONTRIBUTING.md) 
 ## License
 
 AnythingMCP is **open source**, licensed under the [GNU Affero General Public License v3](LICENSE) (AGPL-3.0-only). Cloud-operator code under `ee/` directories is separately licensed and is not required for self-hosting — see the [License FAQ](docs/license-faq.md).
+
+Nexus Development Cycle auto-merged by Hermes on 2026-11-05T00:17Z
